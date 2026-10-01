@@ -33,6 +33,7 @@ prefixes:
     dc: http://purl.org/dc/elements/1.1/
     STATO: https://purl.obolibrary.org/obo/STATO_
     PROV: http://www.w3.org/ns/prov#
+    dcterms: http://purl.org/dc/terms/
 
 default_prefix: nlm-ckn
 
@@ -573,6 +574,10 @@ slots:
         range: string
         slot_uri: HsapDv:0000000
 
+    is_reference_dataset:
+        description: A boolean property for indicating whether a cell set dataset used to classify or categorize other cell set data.
+        range: boolean
+
     ###############################################################################################################
     #####################################              Relations              #####################################
     ###############################################################################################################
@@ -850,6 +855,15 @@ slots:
         exact_mappings:
             - RO:0015013
 
+    is_associated_with:
+        description: A non-causal relationship between two entities that has been established through statistical analyses.
+        exact_mappings:
+            - RO:0004029
+
+    described_in:
+        description: A relation between a resource and a publication it was derived in whole or in part from.
+        exact_mappings:
+            - dcterms:source
 
 classes:
 
@@ -866,7 +880,7 @@ classes:
             - object
   
     CellSet:
-        description: A collection of cells that have some common property.
+        description: A collection of cells that share similar molecular profiles and are grouped together by a clustering algorithm.
         slots:
             - author_cell_term
             - assay
@@ -960,6 +974,7 @@ classes:
             - exact_synonym
             - approval_status
             - drug_type
+            - study_id
 
     AnatomicalStructure:
         description: >-
@@ -984,7 +999,8 @@ classes:
             - database_cross_reference
 
     CellSetDataset:
-        description: A dataset that is about cells taken from one or more tissue samples.
+        description: >-
+            A dataset containing cells obtained from one or more tissue samples and provides the dataset-level experimental context for its constituent cell sets.
         slots:
             - dataset_name
             - dataset_identifier
@@ -1016,6 +1032,7 @@ classes:
             - donor_id_count
             - assay_summary
             - cluster_summary
+            - is_reference_dataset
 
     Publication:
         description: A document that is the output of a publishing process.
@@ -1029,9 +1046,7 @@ classes:
 
     BiomarkerCombination:
         description: >-
-            A cell type marker gene is a gene that is selectively expressed in cells of a
-            given type and can be reliably used alone or in combination as a canonical
-            characteristic to optimally classify them.
+            Cluster classification marker gene combinations that must meet the following criteria: 1) each gene is expressed in the majority of cells of a given type, 2) each gene displays a “binary expression pattern” and 3) gene combinations are optimized for cell type classification using metrics that quantify classification confidence (Liu et.al, 2025).
         class_uri: SO:0001260
         slots:
             - markers
@@ -1069,7 +1084,8 @@ classes:
             - database_cross_reference
 
     BinaryGeneSet:
-        description: A collection of discontinuous sequences.
+        description: >-
+            A collection of binary genes that displays a “binary expression pattern” (i.e., highly expressed in the target cell type and little to no expression in other cell types).
         class_uri: SO:0001260
         slots:
             - markers
@@ -1404,7 +1420,7 @@ classes:
             - predicate
             - object
 
-    GeneIsGeneticBasisForDisease:
+    GeneIsAssociatedWithDisease:
         description: A relationship between a gene and a disease it predisposes an organism to.
         is_a: Association
         slot_usage:
@@ -1418,9 +1434,8 @@ classes:
             predicate:
                 name: predicate
                 description: >-
-                    A relation between a gene and a disease or disorder in which it is a causal
-                    input to.
-                subproperty_of: is_genetic_basis_for_condition
+                    A non-causal relationship between two entities that has been established through statistical analyses.
+                subproperty_of: is_associated_with
             object:
                 name: object
                 description: >-
@@ -1740,31 +1755,8 @@ classes:
             object:
                 name: object
                 description: >-
-                    A material entity of anatomical origin (part of or deriving from an organism)
-                    that has as its parts a maximally connected cell compartment surrounded by a
-                    plasma membrane.
+                    A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
                 range: CellType
-        defining_slots:
-            - subject
-            - predicate
-            - object
-
-    DrugEvaluatedInClinicalTrial:
-        description: A relationship between a drug and some clinical trial it was tested in.
-        is_a: Association
-        slot_usage:
-            subject:
-                name: subject
-                description: A drug product that is bearer of a clinical drug role.
-                range: Drug
-            predicate:
-                name: predicate
-                description: A relation between a drug and some clinical trial it was tested in.
-                subproperty_of: evaluated_in
-            object:
-                name: object
-                description: A clinical investigation that involves an intervention.
-                range: ClinicalTrial
         defining_slots:
             - subject
             - predicate
@@ -1961,6 +1953,32 @@ classes:
                     encode a functional transcript. A gene may include regulatory regions,
                     transcribed regions and/or other functional sequence regions.
                 range: Gene
+        defining_slots:
+            - subject
+            - predicate
+            - object
+
+    AnatomicalStructureComposedPrimarilyOfCellType:
+        description: >-
+            A relationship between an anatomical structure and another anatomical structure
+            it is part of.
+        is_a: Association
+        slot_usage:
+            subject:
+                name: subject
+                description: >-
+                    Material anatomical entity that is a single connected structure with inherent 3D
+                    shape generated by coordinated expression of the organism's own genome.
+                range: AnatomicalStructure
+            predicate:
+                name: predicate
+                description: A relation between a part and some whole entity.
+                subproperty_of: part_of
+            object:
+                name: object
+                description: >-
+                    A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
+                range: CellType
         defining_slots:
             - subject
             - predicate
