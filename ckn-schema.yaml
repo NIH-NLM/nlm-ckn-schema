@@ -1801,6 +1801,10 @@ classes:
                 description: >-
                     A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
                 range: CellType
+            mapping_relation:
+                name: mapping_relation
+                description: A relation for asserting that two items described in different data sources refer to the same type of entity.
+                range: mapping_enum
         defining_slots:
             - subject
             - predicate
