@@ -578,6 +578,10 @@ slots:
         description: A boolean property for indicating whether a cell set dataset used to classify or categorize other cell set data.
         range: boolean
 
+    mapping_relation:
+        description: A relation for asserting that two items described in different data sources refer to the same type of entity.
+        range: mapping_enum
+
     ###############################################################################################################
     #####################################              Relations              #####################################
     ###############################################################################################################
@@ -865,6 +869,46 @@ slots:
         exact_mappings:
             - dcterms:source
 
+    has_soma_location:
+        description: Relation between a neuron and a material anatomical entity that its soma is part of.
+        exact_mappings:
+            - RO:0002100
+
+    has_synaptic_input_or_output_in_region:
+        description: A relationship between a neuron and a region, where the neuron has a functionally relevant number of input and/or output synapses in that region.
+        exact_mappings:
+            - RO:0013001
+
+    axon_synapses_in:
+        description: Relation between a neuron and some structure its axon forms (chemical) synapses in.
+        exact_mappings:
+            - RO:0002102
+
+    has_dendrite_location:
+        description: Relation between a neuron and another anatomical structure its dendritic structure is located in.
+        exact_mappings:
+            - RO:0002360
+
+    has_sensory_dendrite_in:
+        description: Relation between a sensory neuron and some structure in which it receives sensory input via a sensory dendrite.
+        exact_mappings:
+            - RO:0013007
+
+    has_presynaptic_terminal_in:
+        description: Relation between a neuron and some structure (e.g.- a brain region) in which it receives (chemical) synaptic input.
+        exact_mappings:
+            - RO:0002113
+
+    has_synaptic_terminal_in:
+        description: A general relation between a neuron and some structure in which it either chemically synapses to some target or in which it receives (chemical) synaptic input.
+        exact_mappings: 
+            - RO:0002130
+
+    contributes_to_morphology_of:
+        description: p contributes to morphology of w if and only if a change in the morphology of p entails a change in the morphology of w.
+        exact_mappings:
+            - RO:0002433
+
 classes:
 
     Association:
@@ -880,7 +924,7 @@ classes:
             - object
   
     CellSet:
-        description: A collection of cells that share similar molecular profiles and are grouped together by a clustering algorithm.
+        description: A collection of cells that share similar molecular profiles and are grouped together, usually by a clustering algorithm.
         slots:
             - author_cell_term
             - assay
@@ -1046,7 +1090,7 @@ classes:
 
     BiomarkerCombination:
         description: >-
-            Cluster classification marker gene combinations that must meet the following criteria: 1) each gene is expressed in the majority of cells of a given type, 2) each gene displays a “binary expression pattern” and 3) gene combinations are optimized for cell type classification using metrics that quantify classification confidence (Liu et.al, 2025).
+            Cluster classification marker gene combinations optimized for cell type classification using metrics that quantify classification confidence.
         class_uri: SO:0001260
         slots:
             - markers
@@ -1085,7 +1129,7 @@ classes:
 
     BinaryGeneSet:
         description: >-
-            A collection of binary genes that displays a “binary expression pattern” (i.e., highly expressed in the target cell type and little to no expression in other cell types).
+            A collection of binary genes that are characterized by a “binary expression pattern” (i.e., highly expressed in the target cell type and little to no expression in other cell types).
         class_uri: SO:0001260
         slots:
             - markers
@@ -1712,7 +1756,7 @@ classes:
             - predicate
             - object
 
-    CellSetDatasetWasAttributedToPublication:
+    CellSetDatasetDescribedInPublication:
         description: >-
             A relationship between a cell set dataset and the publication that can be used
             as a reference for it.
@@ -1724,8 +1768,8 @@ classes:
                 range: CellSetDataset
             predicate:
                 name: predicate
-                description: Attribution is the ascribing of an entity to an agent.
-                subproperty_of: was_attributed_to
+                description: A relation between a resource and a publication it was derived in whole or in part from.
+                subproperty_of: described_in
             object:
                 name: object
                 description: A document that is the output of a publishing process.
@@ -1960,8 +2004,7 @@ classes:
 
     AnatomicalStructureComposedPrimarilyOfCellType:
         description: >-
-            A relationship between an anatomical structure and another anatomical structure
-            it is part of.
+            A relationship between an anatomical structure and the cell type that structurally composes it.
         is_a: Association
         slot_usage:
             subject:
@@ -1979,6 +2022,199 @@ classes:
                 description: >-
                     A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
                 range: CellType
+        defining_slots:
+            - subject
+            - predicate
+            - object
+
+    CellTypeHasSomaLocationAnatomicalStructure:
+        description: >-
+            A triple assertion involving a cell type and another anatomical structure its soma is part of.
+        is_a: Association
+        slot_usage:
+            subject:
+                name: subject
+                description: >-
+                    A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
+                range: CellType
+            predicate:
+                name: predicate
+                description: Relation between a neuron and a material anatomical entity that its soma is part of.
+                subproperty_of: has_soma_location
+            object:
+                name: object
+                description: >-
+                    Material anatomical entity that is a single connected structure with inherent 3D shape generated by coordinated expression of the organism's own genome.
+                range: AnatomicalStructure
+        defining_slots:
+            - subject
+            - predicate
+            - object
+
+    CellTypeHasSynapticInputOrOutputInRegionAnatomicalStructure:
+        description: >-
+            A triple assertion involving a neuron and another anatomical structure it synapses to or from.
+        is_a: Association
+        slot_usage:
+            subject:
+                name: subject
+                description: >-
+                    A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
+                range: CellType
+            predicate:
+                name: predicate
+                description: A relationship between a neuron and a region, where the neuron has a functionally relevant number of input and/or output synapses in that region.
+                subproperty_of: has_synaptic_input_or_output_in_region
+            object:
+                name: object
+                description: >-
+                    Material anatomical entity that is a single connected structure with inherent 3D shape generated by coordinated expression of the organism's own genome.
+                range: AnatomicalStructure
+        defining_slots:
+            - subject
+            - predicate
+            - object
+
+    CellTypeAxonSynapsesInAnatomicalStructure:
+        description: >-
+            A triple assertion involving a neuron and another anatomical structure it synapses to.
+        is_a: Association
+        slot_usage:
+            subject:
+                name: subject
+                description: >-
+                    A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
+                range: CellType
+            predicate:
+                name: predicate
+                description: Relation between a neuron and some structure its axon forms (chemical) synapses in.
+                subproperty_of: axon_synapses_in
+            object:
+                name: object
+                description: >-
+                    Material anatomical entity that is a single connected structure with inherent 3D shape generated by coordinated expression of the organism's own genome.
+                range: AnatomicalStructure
+        defining_slots:
+            - subject
+            - predicate
+            - object
+
+    CellTypeHasDendriteLocationAnatomicalStructure:
+        description: >-
+            A triple assertion involving a neuron and another anatomical structure its dendritic structure is located in.
+        is_a: Association
+        slot_usage:
+            subject:
+                name: subject
+                description: >-
+                    A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
+                range: CellType
+            predicate:
+                name: predicate
+                description: Relation between a neuron and another anatomical structure its dendritic structure is located in.
+                subproperty_of: has_dendrite_location
+            object:
+                name: object
+                description: >-
+                    Material anatomical entity that is a single connected structure with inherent 3D shape generated by coordinated expression of the organism's own genome.
+                range: AnatomicalStructure
+        defining_slots:
+            - subject
+            - predicate
+            - object
+
+    CellTypeHasPresynapticTerminalInAnatomicalStructure:
+        description: >-
+            A triple assertion involving a neuron and another anatomical structure from which it receives synaptic input.
+        is_a: Association
+        slot_usage:
+            subject:
+                name: subject
+                description: >-
+                    A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
+                range: CellType
+            predicate:
+                name: predicate
+                description: Relation between a neuron and some structure (e.g.- a brain region) in which it receives (chemical) synaptic input.
+                subproperty_of: has_presynaptic_terminal_in
+            object:
+                name: object
+                description: >-
+                    Material anatomical entity that is a single connected structure with inherent 3D shape generated by coordinated expression of the organism's own genome.
+                range: AnatomicalStructure
+        defining_slots:
+            - subject
+            - predicate
+            - object
+
+    CellTypeHasSensoryDendriteInAnatomicalStructure:
+        description: >-
+            A triple assertion involving a sensory neuron and another anatomical structure from which it receives sensory synaptic input.
+        is_a: Association
+        slot_usage:
+            subject:
+                name: subject
+                description: >-
+                    A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
+                range: CellType
+            predicate:
+                name: predicate
+                description: Relation between a sensory neuron and some structure in which it receives sensory input via a sensory dendrite.
+                subproperty_of: has_sensory_dendrite_in
+            object:
+                name: object
+                description: >-
+                    Material anatomical entity that is a single connected structure with inherent 3D shape generated by coordinated expression of the organism's own genome.
+                range: AnatomicalStructure
+        defining_slots:
+            - subject
+            - predicate
+            - object
+
+    CellTypeHasSynapticTerminalInAnatomicalStructure:
+        description: >-
+            A triple assertion involving a neuron and another anatomical structure that is its synaptic target.
+        is_a: Association
+        slot_usage:
+            subject:
+                name: subject
+                description: >-
+                    A material entity of anatomical origin (part of or deriving from an organism) that has as its parts a maximally connected cell compartment surrounded by a plasma membrane.
+                range: CellType
+            predicate:
+                name: predicate
+                description: A general relation between a neuron and some structure in which it either chemically synapses to some target or in which it receives (chemical) synaptic input.
+                subproperty_of: has_synaptic_terminal_in
+            object:
+                name: object
+                description: >-
+                    Material anatomical entity that is a single connected structure with inherent 3D shape generated by coordinated expression of the organism's own genome.
+                range: AnatomicalStructure
+        defining_slots:
+            - subject
+            - predicate
+            - object
+
+    AnatomicalStructureContributesToMorphologyOfAnatomicalStructure:
+        description: >-
+            A triple assertion involving a neuron and another anatomical structure that is its synaptic target.
+        is_a: Association
+        slot_usage:
+            subject:
+                name: subject
+                description: >-
+                    Material anatomical entity that is a single connected structure with inherent 3D shape generated by coordinated expression of the organism's own genome.
+                range: AnatomicalStructure
+            predicate:
+                name: predicate
+                description: >-
+                    p contributes to morphology of w if and only if a change in the morphology of p entails a change in the morphology of w. 
+                subproperty_of: contributes_to_morphology_of
+            object:
+                name: object
+                description: >-
+                    Material anatomical entity that is a single connected structure with inherent 3D shape generated by coordinated expression of the organism's own genome.
+                range: AnatomicalStructure
         defining_slots:
             - subject
             - predicate
@@ -2052,3 +2288,12 @@ enums:
             include_self: false
             relationship_types:
                 - rdfs:subClassOf
+
+    mapping_enum:
+        permissible_values:
+            exact match:
+                description: A transitive mapping relation indicating that two entities are of the same type.
+                meaning: SKOS:exactMatch
+            related match:
+                description: A symmetric mapping relation indicating that two entities are of similar types.
+                meaning: SKOS:relatedMatch
