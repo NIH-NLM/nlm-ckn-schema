@@ -866,8 +866,9 @@ slots:
 
     described_in:
         description: A relation between a resource and a publication it was derived in whole or in part from.
+        # Placeholder
         exact_mappings:
-            - dcterms:source
+            - PROV:describedIn
 
     has_soma_location:
         description: Relation between a neuron and a material anatomical entity that its soma is part of.
